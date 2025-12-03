@@ -25,49 +25,49 @@ dir:   .byte 0
 .text
 
 blinker:
-    push {r0,r1,r2,r3,lr}
+    push {r0, r1, r2, r3, r4, lr}   // save registers
 
-    LDR R0, =0x41200000    // LED hardware
-    LDR R1, =state
-    LDRB R1, [R1]          // current LED state
+    LDR  r0, =0x41200000             // LED hardware address
 
-    LDR R2, =dir
-    LDRB R3, [R2]          // current direction
+    // Load current LED state
+    LDR  r1, =state
+    LDRB r1, [r1]
 
-    CMP R3, #0
-    BEQ shift_left
-    B shift_right
+    // Output to LEDs
+    STRB r1, [r0]
 
-shift_left:
-    CMP R1, #8             // Are we at LD3?
-    BEQ change_dir_right
+    // Load direction
+    LDR  r2, =dir
+    LDRB r3, [r2]
 
-    LSL R1, R1, #1         // shift left
-    B write_back
+    CMP  r3, #0
+    BEQ  go_left
+    B    go_right
 
-change_dir_right:
-    MOV R3, #1
-    STRB R3, [R2]          // change direction
-    B shift_right           // shift right immediately next
+go_left:
+    LSL  r1, r1, #1
+    CMP  r1, #0x10
+    BNE  write_back_left
+    MOV  r1, #8
+    MOV  r3, #1
+    STRB r3, [r2]       // update dir
+write_back_left:
+    B    write_back
 
-shift_right:
-    CMP R1, #1             // Are we at LD0?
-    BEQ change_dir_left
-
-    LSR R1, R1, #1         // shift right
-    B write_back
-
-change_dir_left:
-    MOV R3, #0
-    STRB R3, [R2]
-    B shift_left
+go_right:
+    LSR  r1, r1, #1
+    CMP  r1, #0
+    BNE  write_back_right
+    MOV  r1, #1
+    MOV  r3, #0
+    STRB r3, [r2]       // update dir
+write_back_right:
 
 write_back:
-    STRB R1, [R0]          // write LED
-    LDR R4, =state
-    STRB R1, [R4]          // save state
+    // Save new state
+    LDR  r4, =state     // use r4 to avoid r2 conflict
+    STRB r1, [r4]
 
-    pop {r0,r1,r2,r3,lr}
-    bx lr
-
+    pop  {r0, r1, r2, r3, r4, lr}
+    bx   lr
 
