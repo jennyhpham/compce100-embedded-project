@@ -164,6 +164,16 @@ void TickHandler1(void *CallBackRef)
 		move_alien(&game);
 		update_bullets(&game);
 	}
+	else if (game.game_state == GAME_WIN)
+	{
+		// Show win screen when player has enough hits
+		draw_win_screen(&game);
+	}
+	else if (game.game_state == GAME_LOSE)
+	{
+		// Show lose screen when player has too many misses
+		draw_lose_screen(&game);
+	}
 
 	//****END OF OWN CODE*****************
 	// clear timer interrupt status. DO NOT REMOVE
@@ -182,8 +192,7 @@ void ButtonHandler(void *CallBackRef, u32 Bank, u32 Status)
 	// 0x01 -> BTN0, 0x02 -> BTN1, 0x04 -> BTN2, 0x08 -> BTN3,
 	// 0x10 -> SW0, 0x20 -> SW1
 
-	// Only allow movement in "playing" state (0 = playing, others for win/lose later)
-	// BTN0 (bit 0): move right
+	// BTN0 (bit 0): move right (only while playing)
 	if ((Status & 0x01) && game.game_state == GAME_PLAYING)
 	{
 		// Keep ship within game field (x = 1..6, ship width is 3; side can reach column 7)
@@ -194,7 +203,7 @@ void ButtonHandler(void *CallBackRef, u32 Bank, u32 Status)
 		}
 	}
 
-	// BTN1 (bit 1): move left
+	// BTN1 (bit 1): move left (only while playing)
 	else if ((Status & 0x02) && game.game_state == GAME_PLAYING)
 	{
 		if (game.ship_x > 1)
@@ -204,7 +213,7 @@ void ButtonHandler(void *CallBackRef, u32 Bank, u32 Status)
 		}
 	}
 
-	// BTN2 (bit 2): fire or restart
+	// BTN2 (bit 2): fire while playing
 	else if (Status & 0x04)
 	{
 		if (game.game_state == GAME_PLAYING)
@@ -213,6 +222,7 @@ void ButtonHandler(void *CallBackRef, u32 Bank, u32 Status)
 		}
 	}
 
+	// BTN3 (bit 3): always restart
 	else if (Status & 0x08)
 	{
 		reset_game(&game);

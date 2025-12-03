@@ -335,3 +335,92 @@ void reset_game(GameState *g)
 	draw_alien(g);
 	update_score_display(g);
 }
+
+// Draw a simple "WIN" pattern on the 8x8 matrix.
+// This clears the whole matrix and then lights pixels to form letters.
+void draw_win_screen(GameState *g)
+{
+	(void)g; // currently unused but kept for symmetry / future use
+
+	// Clear screen
+	for (uint8_t x = 0; x < 8; x++)
+	{
+		for (uint8_t y = 0; y < 8; y++)
+		{
+			SetPixel(x, y, 0, 0, 0);
+		}
+	}
+
+	// Use bright green for "WIN"
+	// W in columns 0-2
+	SetPixel(0, 1, 0, 255, 0);
+	SetPixel(0, 2, 0, 255, 0);
+	SetPixel(0, 3, 0, 255, 0);
+	SetPixel(1, 3, 0, 255, 0);
+	SetPixel(1, 2, 0, 255, 0);
+	SetPixel(2, 3, 0, 255, 0);
+	SetPixel(2, 2, 0, 255, 0);
+	SetPixel(2, 1, 0, 255, 0);
+
+	// I in columns 3-4
+	SetPixel(3, 1, 0, 255, 0);
+	SetPixel(3, 2, 0, 255, 0);
+	SetPixel(3, 3, 0, 255, 0);
+	SetPixel(4, 1, 0, 255, 0);
+	SetPixel(4, 2, 0, 255, 0);
+	SetPixel(4, 3, 0, 255, 0);
+
+	// N in columns 5-7
+	SetPixel(5, 1, 0, 255, 0);
+	SetPixel(5, 2, 0, 255, 0);
+	SetPixel(5, 3, 0, 255, 0);
+	SetPixel(6, 2, 0, 255, 0);
+	SetPixel(7, 1, 0, 255, 0);
+	SetPixel(7, 2, 0, 255, 0);
+	SetPixel(7, 3, 0, 255, 0);
+}
+
+// Draw a simple "LOSE" pattern on the 8x8 matrix.
+void draw_lose_screen(GameState *g)
+{
+	(void)g;
+
+	// Clear screen
+	for (uint8_t x = 0; x < 8; x++)
+	{
+		for (uint8_t y = 0; y < 8; y++)
+		{
+			SetPixel(x, y, 0, 0, 0);
+		}
+	}
+
+	// Use bright red for "LOSE"
+	// L in columns 0-1
+	SetPixel(0, 1, 255, 0, 0);
+	SetPixel(0, 2, 255, 0, 0);
+	SetPixel(0, 3, 255, 0, 0);
+	SetPixel(1, 3, 255, 0, 0);
+
+	// O in columns 2-3
+	SetPixel(2, 1, 255, 0, 0);
+	SetPixel(3, 1, 255, 0, 0);
+	SetPixel(2, 2, 255, 0, 0);
+	SetPixel(3, 2, 255, 0, 0);
+	SetPixel(2, 3, 255, 0, 0);
+	SetPixel(3, 3, 255, 0, 0);
+
+	// S in columns 4-5
+	SetPixel(4, 1, 255, 0, 0);
+	SetPixel(5, 1, 255, 0, 0);
+	SetPixel(4, 2, 255, 0, 0);
+	SetPixel(5, 3, 255, 0, 0);
+	SetPixel(4, 3, 255, 0, 0);
+
+	// E in columns 6-7
+	SetPixel(6, 1, 255, 0, 0);
+	SetPixel(6, 2, 255, 0, 0);
+	SetPixel(6, 3, 255, 0, 0);
+	SetPixel(7, 1, 255, 0, 0);
+	SetPixel(7, 2, 255, 0, 0);
+	SetPixel(7, 3, 255, 0, 0);
+}
