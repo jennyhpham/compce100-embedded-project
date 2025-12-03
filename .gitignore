@@ -1,0 +1,6 @@
+*.log
+*.analytics
+*.metadata/
+Embedded_Exercise_system/
+PYNQ-Z1-matrix/
+RemoteSystemsTempFiles/
