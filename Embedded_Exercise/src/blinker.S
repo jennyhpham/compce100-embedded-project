@@ -17,103 +17,52 @@
 //STR R1,[R0]			(R1 contains the data and R0 contains the address where  to store, 32-bit)
 //STRB R1,[R0]			(R1 contains the data and R0 contains the address where  to store, 8-bit)
 
-
 .data
-	dir: .byte 1		//8-bit variable for direction
-pos: .byte 0        // 8-bit variable for current LED position (0..3)
-
-
-.text
+state: .byte 1
+dir:   .byte 0    
 
 .global blinker
-
+.text
 
 blinker:
+    push {r0, r1, r2, r3, lr}
 
-	// Push used registers to stack
-	push {r0-r4, lr}
+    LDR R0, =0x41200000    // LED output register
+    LDR R2, =dir           // direction variable
+    LDRB R3, [R2]          // R3 = direction (0=left,1=right)
 
-blink_loop:
-	// r0 = base address of LED register
-	LDR  r0, =0x41200000
+    LDR R1, =state         // load current LED state (1,2,4,8)
+    LDRB R1, [R1]
 
-	// Load current position (0..3) from 'pos'
-	LDR  r1, =pos
-	LDRB r2, [r1]          // r2 = pos
+    CMP R3, #0
+    BEQ go_left
+    B go_right
 
-	// Compute LED mask: (1 << pos) into r3
-	MOV  r3, #1
-	LSL  r3, r3, r2
+go_left:
+    LSL R1, R1, #1
+    CMP R1, #0x10
+    BNE write_back
+    MOV R1, #8
+    MOV R3, #1          // change direction to right
+    STRB R3, [R2]
+    B write_back
 
-	// Write mask to LED register (only LD0..LD3 used)
-	STRB r3, [r0]
+go_right:
+    LSR R1, R1, #1
+    CMP R1, #0
+    BNE write_back
+    MOV R1, #1
+    MOV R3, #0          // change direction to left
+    STRB R3, [R2]
 
-	// -----------------------
-	// Simple delay loop
-	// -----------------------
-	// Outer loop count in r4 (increase this if the blinking is too fast)
-	MOV  r4, #0x40        // adjust for visible speed
+write_back:
+    STRB R1, [R0]        // write LED (8-bit)
 
-delay_outer:
-	MOV  r2, #0xFF        // inner loop counter
+    LDR R4, =state       // FIX: must load address into register
+    STRB R1, [R4]        // save new state
 
-delay_inner:
-	SUBS r2, r2, #1
-	BNE  delay_inner
-
-	SUBS r4, r4, #1
-	BNE  delay_outer
-
-	// -----------------------
-	// Update position based on direction
-	// -----------------------
-	// Load dir (0 = right, 1 = left)
-	LDR  r0, =dir
-	LDRB r2, [r0]         // r2 = dir
-
-	// Reload pos
-	LDR  r1, =pos
-	LDRB r3, [r1]         // r3 = pos
-
-	CMP  r2, #0
-	BNE  move_left
-
-	// ---- Move right: pos++ ----
-	ADD  r3, r3, #1
-	STRB r3, [r1]
-
-	// If pos < 3, keep going right
-	CMP  r3, #3
-	BLT  blink_loop
-
-	// Reached LD3 (pos == 3), change direction to left
-	MOV  r2, #1
-	STRB r2, [r0]
-	B    blink_loop
-
-move_left:
-	// ---- Move left: pos-- ----
-	SUB  r3, r3, #1
-	STRB r3, [r1]
-
-	// If pos > 0, keep going left
-	CMP  r3, #0
-	BGT  blink_loop
-
-	// Reached LD0 (pos == 0), change direction to right
-	MOV  r2, #0
-	STRB r2, [r0]
-
-	B    blink_loop
-
-	// NOTE: We never reach here, blinker runs forever.
-	// If you need it to return instead of infinite loop,
-	// replace 'blink_loop' tail branches with 'b done' and
-	// uncomment the code below.
-done:
-	pop {r0-r4, lr}				//Pop registers from stack
-	bx lr						//Return to place where this function has been called.
-
+    pop {r0, r1, r2, r3, lr}
+    bx lr
 
 
 

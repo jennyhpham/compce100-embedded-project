@@ -165,6 +165,8 @@ void TickHandler1(void *CallBackRef)
 		update_bullets(&game);
 	}
 
+	blinker();
+
 	//****END OF OWN CODE*****************
 	// clear timer interrupt status. DO NOT REMOVE
 	StatusEvent = XTtcPs_GetInterruptStatus((XTtcPs *)CallBackRef);
