@@ -151,7 +151,7 @@ void TickHandler(void *CallBackRef)
 	Xil_ExceptionEnable();
 }
 
-// Timer interrupt for moving alien, shooting... Frequency is 10 Hz by default
+// Timer interrupt for moving alien, shooting... Frequency is 5 Hz
 void TickHandler1(void *CallBackRef)
 {
 
@@ -163,16 +163,6 @@ void TickHandler1(void *CallBackRef)
 	{
 		move_alien(&game);
 		update_bullets(&game);
-	}
-	else if (game.game_state == GAME_WIN)
-	{
-		// Show win screen when player has enough hits
-		draw_win_screen(&game);
-	}
-	else if (game.game_state == GAME_LOSE)
-	{
-		// Show lose screen when player has too many misses
-		draw_lose_screen(&game);
 	}
 
 	//****END OF OWN CODE*****************

@@ -60,7 +60,5 @@ void fire_bullet(GameState* g);
 void update_bullets(GameState* g);
 void update_score_display(GameState* g);
 void reset_game(GameState* g);
-void draw_win_screen(GameState* g);
-void draw_lose_screen(GameState* g);
  #endif /* PIXEL_H_ */
  
